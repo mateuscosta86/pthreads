@@ -40,7 +40,6 @@ int main(void) {
 
     for (int i = 0; i < N_THREADS; ++i) {
         printf("%s", threads_params[i]);
-
     }
         
 
