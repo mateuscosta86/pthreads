@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <pthread.h>
+
+pthread_t t1;
+pthread_t t2;
+
+#define N_THREADS           4
+
+pthread_t depositers[N_THREADS];
+pthread_t withdrawers[N_THREADS];
+
+double balance = 10000.0;
+pthread_mutex_t balance_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+
+void worker_code_1(void) {
+    for( int i=0; i < 10; ++i) {
+		printf("Worker 1 depositing R$20, i=%d\n",i);
+		pthread_mutex_lock(&balance_mutex);
+		balance = balance + 20;
+		pthread_mutex_unlock(&balance_mutex);
+
+	}
+}
+
+void worker_code_2(void) {
+    for( int i=0; i < 10; ++i) {
+		printf("Worker 2 withdrawing R$20, i=%d\n",i);
+		pthread_mutex_lock(&balance_mutex);
+		balance = balance - 20;
+		pthread_mutex_unlock(&balance_mutex);
+	}
+}
+
+
+int main(void) {
+    printf("Beginning\n");
+
+	for (int i = 0; i < N_THREADS; ++i)
+        pthread_create(&depositers[i], NULL, (void *)worker_code_1, NULL);
+    
+	for (int i = 0; i < N_THREADS; ++i)
+        pthread_create(&withdrawers[i], NULL, (void *)worker_code_2, NULL);
+    
+	for (int i = 0; i < N_THREADS; ++i)
+        pthread_join(depositers[i], NULL);
+
+	for (int i = 0; i < N_THREADS; ++i)
+        pthread_join(withdrawers[i], NULL);
+
+    printf("Done: new balance is %.2f\n", balance);
+
+    return(0);
+}
