@@ -15,20 +15,25 @@ pthread_mutex_t balance_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 
 void worker_code_1(void) {
-    for( int i=0; i < 10; ++i) {
+    for( int i=0; i < 20; ++i) {
 		printf("Worker 1 depositing R$20, i=%d\n",i);
 		pthread_mutex_lock(&balance_mutex);
 		balance = balance + 20;
 		pthread_mutex_unlock(&balance_mutex);
-
+		printf("Worker 1 deposited R$20, i=%d\n",i);	
 	}
 }
 
 void worker_code_2(void) {
-    for( int i=0; i < 10; ++i) {
+	double withdraw;
+    for( int i=0; i < 20; ++i) {
 		printf("Worker 2 withdrawing R$20, i=%d\n",i);
 		pthread_mutex_lock(&balance_mutex);
-		balance = balance - 20;
+		if (balance >= 20.0)
+			withdraw = 20.0;
+		else
+			withdraw = balance;
+		balance -= withdraw;
 		pthread_mutex_unlock(&balance_mutex);
 	}
 }
